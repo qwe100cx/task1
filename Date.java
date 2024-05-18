@@ -1,67 +1,48 @@
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+package data;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class Date {
 
-    private static JTextField mainDateField;
-    private static JTextField daysField;
-    private static JTextField monthsField;
-    private static JTextField yearsField;
-    private static JTextField resultField;
+    private int daysSinceStartDate;
 
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("Date Operations");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 300);
-
-        JPanel panel = new JPanel();
-
-        JLabel mainDateLabel = new JLabel("Основная дата (гггг-мм-дд): ");
-        mainDateField = new JTextField(10);
-
-        JLabel daysLabel = new JLabel("Дни:");
-        daysField = new JTextField(5);
-
-        JLabel monthsLabel = new JLabel("Месяцы:");
-        monthsField = new JTextField(5);
-
-        JLabel yearsLabel = new JLabel("Годы:");
-        yearsField = new JTextField(5);
-
-        JButton calculateButton = new JButton("Выполнить операции");
-
-        JLabel resultLabel = new JLabel("Результат:");
-        resultField = new JTextField(10);
-
-        panel.add(mainDateLabel);
-        panel.add(mainDateField);
-        panel.add(daysLabel);
-        panel.add(daysField);
-        panel.add(monthsLabel);
-        panel.add(monthsField);
-        panel.add(yearsLabel);
-        panel.add(yearsField);
-        panel.add(calculateButton);
-        panel.add(resultLabel);
-        panel.add(resultField);
-
-        calculateButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                LocalDate mainDate = LocalDate.parse(mainDateField.getText(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                int days = Integer.parseInt(daysField.getText());
-                int months = Integer.parseInt(monthsField.getText());
-                int years = Integer.parseInt(yearsField.getText());
-
-                LocalDate resultDate = mainDate.plusDays(days).plusMonths(months).plusYears(years);
-                resultField.setText(resultDate.toString());
-            }
-        });
-
-        frame.add(panel);
-        frame.setVisible(true);
+    public Date(int daysSinceStartDate) {
+        LocalDate startDate = LocalDate.of(1, 1, 1); // Устанавливаем дату 01.01.0001
+        this.daysSinceStartDate = (int) startDate.toEpochDay();
     }
+
+
+
+    public static Date parseString(String dateString, String pattern) {
+        LocalDate date = LocalDate.parse(dateString, DateTimeFormatter.ofPattern(pattern));
+        return new Date((int) date.toEpochDay());
+    }
+
+    public void addDays(int days) {
+        daysSinceStartDate += days;
+    }
+
+    public void addMonths(int months) {
+        LocalDate date = LocalDate.ofEpochDay(daysSinceStartDate);
+        date = date.plusMonths(months);
+        daysSinceStartDate = (int) date.toEpochDay();
+    }
+
+    public void addYears(int years) {
+        LocalDate date = LocalDate.ofEpochDay(daysSinceStartDate);
+        date = date.plusYears(years);
+        daysSinceStartDate = (int) date.toEpochDay();
+    }
+
+    public int compare(Date other) {
+        return Integer.compare(this.daysSinceStartDate, other.daysSinceStartDate);
+    }
+
+    public String format(String pattern) {
+        LocalDate date = LocalDate.ofEpochDay(daysSinceStartDate);
+        return date.format(DateTimeFormatter.ofPattern(pattern));
+    }
+
 }
+
